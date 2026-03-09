@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { useRouter } from 'expo-router';
 import { Box } from '@/components/ui/box';
 import { Button, ButtonText, ButtonIcon } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -85,6 +86,7 @@ function StoreCard(props: {
 }
 
 export default function StoresScreen() {
+  const router = useRouter();
   const { stores, loading, error, createStore, updateStore, deleteStore } =
     useStores();
   const setSelectedStoreId = useAppStore((s) => s.setSelectedStoreId);
@@ -187,7 +189,10 @@ export default function StoresScreen() {
                   store={store}
                   onEdit={() => handleEdit(store)}
                   onDelete={() => handleDeleteClick(store)}
-                  onSelect={() => setSelectedStoreId(store.id)}
+                  onSelect={() => {
+                    setSelectedStoreId(store.id);
+                    router.push('/(tabs)/products');
+                  }}
                 />
               ))}
             </Box>

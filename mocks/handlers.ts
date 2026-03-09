@@ -80,13 +80,9 @@ export const handlers = [
   http.get(`${base}/products`, ({ request }) => {
     const url = new URL(request.url);
     const storeId = url.searchParams.get('storeId');
-    if (!storeId) {
-      return HttpResponse.json(
-        { error: 'storeId é obrigatório' },
-        { status: 400 }
-      );
-    }
-    const products = db.products.filter((p) => p.storeId === storeId);
+    const products = storeId
+      ? db.products.filter((p) => p.storeId === storeId)
+      : db.products;
     return HttpResponse.json(products);
   }),
 

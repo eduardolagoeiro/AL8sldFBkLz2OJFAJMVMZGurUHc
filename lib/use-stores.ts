@@ -6,12 +6,14 @@ import {
   deleteStore as deleteStoreApi,
 } from './stores-api';
 import { useAppStore } from './store';
-import type { CreateStoreInput, UpdateStoreInput } from './types';
+import type { CreateStoreInput, Store, UpdateStoreInput } from './types';
 import { createStoreSchema, updateStoreSchema } from './types';
 import { formatZodMessage } from './format-zod-message';
 
+const EMPTY_STORES: Store[] = [];
+
 export function useStores() {
-  const stores = useAppStore((state) => state.stores);
+  const stores = useAppStore((state) => state.stores ?? EMPTY_STORES);
   const loading = useAppStore((state) => state.loading.stores);
   const error = useAppStore((state) => state.error.stores);
   const setStores = useAppStore((state) => state.setStores);

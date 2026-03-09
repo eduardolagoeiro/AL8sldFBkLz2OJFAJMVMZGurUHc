@@ -9,6 +9,12 @@ export async function fetchProducts(storeId: string): Promise<Product[]> {
   return res.json();
 }
 
+export async function fetchAllProducts(): Promise<Product[]> {
+  const res = await fetch(apiUrl('/api/products'));
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
 export async function createProduct(
   payload: CreateProductInput
 ): Promise<Product> {

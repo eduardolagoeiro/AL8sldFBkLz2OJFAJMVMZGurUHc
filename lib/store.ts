@@ -10,6 +10,7 @@ interface AppState {
 
   setStores: (stores: Store[]) => void;
   setProducts: (storeId: string, products: Product[]) => void;
+  setProductsFromList: (products: Product[]) => void;
   setSelectedStoreId: (storeId: string | null) => void;
   setStoresLoading: (loading: boolean) => void;
   setProductsLoading: (loading: boolean) => void;
@@ -36,6 +37,14 @@ export const useAppStore = create<AppState>((set) => ({
   setProducts: (storeId, products) =>
     set((state) => ({
       productsByStore: { ...state.productsByStore, [storeId]: products },
+    })),
+  setProductsFromList: (products) =>
+    set(() => ({
+      productsByStore: products.reduce<Record<string, Product[]>>((acc, p) => {
+        if (!acc[p.storeId]) acc[p.storeId] = [];
+        acc[p.storeId].push(p);
+        return acc;
+      }, {}),
     })),
   setSelectedStoreId: (storeId) => set({ selectedStoreId: storeId }),
   setStoresLoading: (loading) =>

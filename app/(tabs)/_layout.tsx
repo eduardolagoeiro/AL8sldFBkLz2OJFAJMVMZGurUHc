@@ -11,10 +11,11 @@ function TabBarIcon(props: {
 }
 
 export default function TabLayout() {
+  const headerShown = useClientOnlyValue(false, true);
   return (
     <Tabs
       screenOptions={{
-        headerShown: useClientOnlyValue(false, true),
+        headerShown,
       }}
     >
       <Tabs.Screen

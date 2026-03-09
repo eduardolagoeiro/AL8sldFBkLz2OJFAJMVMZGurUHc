@@ -1,22 +1,24 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import {
   fetchProducts,
+  fetchAllProducts,
   createProduct as createProductApi,
   updateProduct as updateProductApi,
   deleteProduct as deleteProductApi,
 } from './products-api';
 import { useAppStore } from './store';
-import type { CreateProductInput, UpdateProductInput } from './types';
+import type { CreateProductInput, Product, UpdateProductInput } from './types';
 import { createProductSchema, updateProductSchema } from './types';
 import { formatZodMessage } from './format-zod-message';
 
+const EMPTY_PRODUCTS: Product[] = [];
+
 export function useProducts(storeId: string | null) {
-  const products = useAppStore((state) =>
-    storeId ? (state.productsByStore[storeId] ?? []) : []
-  );
+  const productsByStore = useAppStore((state) => state.productsByStore);
   const loading = useAppStore((state) => state.loading.products);
   const error = useAppStore((state) => state.error.products);
   const setProducts = useAppStore((state) => state.setProducts);
+  const setProductsFromList = useAppStore((state) => state.setProductsFromList);
   const setProductsLoading = useAppStore((state) => state.setProductsLoading);
   const setProductsError = useAppStore((state) => state.setProductsError);
   const addProduct = useAppStore((state) => state.addProduct);
@@ -25,13 +27,22 @@ export function useProducts(storeId: string | null) {
   );
   const removeProduct = useAppStore((state) => state.removeProduct);
 
+  const products = useMemo(() => {
+    if (storeId) return productsByStore[storeId] ?? EMPTY_PRODUCTS;
+    return Object.values(productsByStore).flat();
+  }, [storeId, productsByStore]);
+
   const refetch = useCallback(async () => {
-    if (!storeId) return;
     setProductsLoading(true);
     setProductsError(null);
     try {
-      const data = await fetchProducts(storeId);
-      setProducts(storeId, data);
+      if (storeId) {
+        const data = await fetchProducts(storeId);
+        setProducts(storeId, data);
+      } else {
+        const data = await fetchAllProducts();
+        setProductsFromList(data);
+      }
     } catch (e) {
       setProductsError(
         e instanceof Error ? e.message : 'Erro ao carregar produtos'
@@ -39,7 +50,13 @@ export function useProducts(storeId: string | null) {
     } finally {
       setProductsLoading(false);
     }
-  }, [storeId, setProducts, setProductsLoading, setProductsError]);
+  }, [
+    storeId,
+    setProducts,
+    setProductsFromList,
+    setProductsLoading,
+    setProductsError,
+  ]);
 
   useEffect(() => {
     refetch();
@@ -47,6 +64,8 @@ export function useProducts(storeId: string | null) {
 
   const createProduct = useCallback(
     async (payload: CreateProductInput) => {
+      if (!storeId)
+        throw new Error('Selecione uma loja para adicionar produto');
       const parsed = createProductSchema.safeParse(payload);
       if (!parsed.success) {
         throw new Error(formatZodMessage(parsed.error));
@@ -77,13 +96,12 @@ export function useProducts(storeId: string | null) {
   );
 
   const deleteProduct = useCallback(
-    async (id: string) => {
-      if (!storeId) return;
+    async (id: string, productStoreId: string) => {
       setProductsError(null);
       await deleteProductApi(id);
-      removeProduct(storeId, id);
+      removeProduct(productStoreId, id);
     },
-    [storeId, removeProduct, setProductsError]
+    [removeProduct, setProductsError]
   );
 
   return {

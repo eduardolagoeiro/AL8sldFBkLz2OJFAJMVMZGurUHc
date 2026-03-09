@@ -25,10 +25,11 @@ import type { Product as ProductType } from '@/lib/types';
 
 function ProductCard(props: {
   product: ProductType;
+  storeName?: string;
   onEdit: () => void;
   onDelete: () => void;
 }) {
-  const { product, onEdit, onDelete } = props;
+  const { product, storeName, onEdit, onDelete } = props;
   const priceFormatted = new Intl.NumberFormat('pt-BR', {
     style: 'currency',
     currency: 'BRL',
@@ -51,6 +52,7 @@ function ProductCard(props: {
         </HStack>
         <Text className="text-typography-600 text-sm mb-1">
           {product.category}
+          {storeName ? ` • ${storeName}` : ''}
         </Text>
         <Text className="text-typography-900 font-medium text-lg mb-3">
           {priceFormatted}
@@ -97,19 +99,16 @@ export default function ProductsScreen() {
   const [editingProduct, setEditingProduct] = useState<ProductType | null>(
     null
   );
-  const [deleteProductId, setDeleteProductId] = useState<string | null>(null);
-
   const selectedStore = stores.find((s) => s.id === selectedStoreId);
 
   const filteredProducts = useMemo(() => {
-    if (!selectedStoreId) return [];
     const q = searchQuery.trim().toLowerCase();
     if (!q) return products;
     return products.filter(
       (p) =>
         p.name.toLowerCase().includes(q) || p.category.toLowerCase().includes(q)
     );
-  }, [products, searchQuery, selectedStoreId]);
+  }, [products, searchQuery]);
 
   function handleEdit(product: ProductType) {
     setEditingProduct(product);
@@ -139,27 +138,19 @@ export default function ProductsScreen() {
     handleCloseForm();
   }
 
+  const [productToDelete, setProductToDelete] = useState<{
+    id: string;
+    storeId: string;
+  } | null>(null);
+
   function handleDeleteClick(product: ProductType) {
-    setDeleteProductId(product.id);
+    setProductToDelete({ id: product.id, storeId: product.storeId });
   }
 
   async function handleConfirmDelete() {
-    if (!deleteProductId) return;
-    await deleteProduct(deleteProductId);
-    setDeleteProductId(null);
-  }
-
-  if (!selectedStoreId || !selectedStore) {
-    return (
-      <Box className="flex-1 bg-background-100 p-6 justify-center items-center">
-        <Text className="text-typography-600 text-center mb-4">
-          Selecione uma loja para gerenciar os produtos.
-        </Text>
-        <Button onPress={() => router.push('/(tabs)/stores')}>
-          <ButtonText>Ir para Lojas</ButtonText>
-        </Button>
-      </Box>
-    );
+    if (!productToDelete) return;
+    await deleteProduct(productToDelete.id, productToDelete.storeId);
+    setProductToDelete(null);
   }
 
   return (
@@ -175,7 +166,9 @@ export default function ProductsScreen() {
                 Produtos
               </Text>
               <Text className="text-typography-600 text-sm mt-1">
-                Loja: {selectedStore.name}
+                {selectedStore
+                  ? `Loja: ${selectedStore.name}`
+                  : 'Todos os produtos'}
               </Text>
             </Box>
             <HStack className="gap-2" space="sm">
@@ -185,12 +178,18 @@ export default function ProductsScreen() {
                 action="secondary"
                 size="sm"
               >
-                <ButtonText>Trocar loja</ButtonText>
+                <ButtonText>
+                  {selectedStore
+                    ? 'Trocar loja'
+                    : 'Selecionar loja para filtrar'}
+                </ButtonText>
               </Button>
-              <Button onPress={() => setFormOpen(true)} size="md">
-                <ButtonIcon as={AddIcon} />
-                <ButtonText>Novo produto</ButtonText>
-              </Button>
+              {selectedStoreId ? (
+                <Button onPress={() => setFormOpen(true)} size="md">
+                  <ButtonIcon as={AddIcon} />
+                  <ButtonText>Novo produto</ButtonText>
+                </Button>
+              ) : null}
             </HStack>
           </HStack>
 
@@ -222,7 +221,7 @@ export default function ProductsScreen() {
               <Text className="text-typography-500 text-center">
                 {searchQuery.trim()
                   ? 'Nenhum produto encontrado.'
-                  : 'Nenhum produto cadastrado nesta loja.'}
+                  : 'Nenhum produto cadastrado.'}
               </Text>
             </Box>
           ) : (
@@ -231,6 +230,11 @@ export default function ProductsScreen() {
                 <ProductCard
                   key={product.id}
                   product={product}
+                  storeName={
+                    !selectedStoreId
+                      ? stores.find((s) => s.id === product.storeId)?.name
+                      : undefined
+                  }
                   onEdit={() => handleEdit(product)}
                   onDelete={() => handleDeleteClick(product)}
                 />
@@ -245,20 +249,20 @@ export default function ProductsScreen() {
         onClose={handleCloseForm}
         onSubmit={handleFormSubmit}
         product={editingProduct}
-        storeId={selectedStoreId}
+        storeId={selectedStoreId ?? editingProduct?.storeId ?? ''}
       />
 
       <AlertDialog
-        isOpen={!!deleteProductId}
-        onClose={() => setDeleteProductId(null)}
+        isOpen={!!productToDelete}
+        onClose={() => setProductToDelete(null)}
       >
-        <AlertDialogBackdrop onPress={() => setDeleteProductId(null)} />
+        <AlertDialogBackdrop onPress={() => setProductToDelete(null)} />
         <AlertDialogContent>
           <AlertDialogHeader>
             <Text className="font-semibold text-typography-900">
               Excluir produto
             </Text>
-            <AlertDialogCloseButton onPress={() => setDeleteProductId(null)} />
+            <AlertDialogCloseButton onPress={() => setProductToDelete(null)} />
           </AlertDialogHeader>
           <AlertDialogBody>
             <Text className="text-typography-600">
@@ -268,7 +272,7 @@ export default function ProductsScreen() {
           <AlertDialogFooter>
             <Button
               variant="outline"
-              onPress={() => setDeleteProductId(null)}
+              onPress={() => setProductToDelete(null)}
               action="secondary"
             >
               <ButtonText>Cancelar</ButtonText>
