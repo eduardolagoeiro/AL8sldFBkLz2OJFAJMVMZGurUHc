@@ -1,5 +1,5 @@
 import { apiUrl } from './api';
-import type { Product } from './types';
+import type { Product, CreateProductInput, UpdateProductInput } from './types';
 
 export async function fetchProducts(storeId: string): Promise<Product[]> {
   const res = await fetch(
@@ -9,12 +9,9 @@ export async function fetchProducts(storeId: string): Promise<Product[]> {
   return res.json();
 }
 
-export async function createProduct(payload: {
-  storeId: string;
-  name: string;
-  category: string;
-  price: number;
-}): Promise<Product> {
+export async function createProduct(
+  payload: CreateProductInput
+): Promise<Product> {
   const res = await fetch(apiUrl('/api/products'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -29,7 +26,7 @@ export async function createProduct(payload: {
 
 export async function updateProduct(
   id: string,
-  payload: { name?: string; category?: string; price?: number }
+  payload: UpdateProductInput
 ): Promise<Product> {
   const res = await fetch(apiUrl(`/api/products/${id}`), {
     method: 'PUT',
