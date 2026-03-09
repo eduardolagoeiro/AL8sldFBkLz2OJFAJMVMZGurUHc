@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/form-control';
 import { Box } from '@/components/ui/box';
 import { Text } from '@/components/ui/text';
+import { CategorySelect } from '@/components/CategorySelect';
 import type { Product, CreateProductInput } from '@/lib/types';
 
 interface ProductFormModalProps {
@@ -27,10 +28,18 @@ interface ProductFormModalProps {
   onSubmit: (payload: CreateProductInput) => Promise<void>;
   product?: Product | null;
   storeId: string;
+  categories?: string[];
 }
 
 export function ProductFormModal(props: ProductFormModalProps) {
-  const { isOpen, onClose, onSubmit, product, storeId } = props;
+  const {
+    isOpen,
+    onClose,
+    onSubmit,
+    product,
+    storeId,
+    categories = [],
+  } = props;
   const [name, setName] = useState('');
   const [category, setCategory] = useState('');
   const [priceStr, setPriceStr] = useState('');
@@ -132,17 +141,15 @@ export function ProductFormModal(props: ProductFormModalProps) {
               <FormControlLabel>
                 <FormControlLabelText>Categoria</FormControlLabelText>
               </FormControlLabel>
-              <Input>
-                <InputField
-                  placeholder="Categoria"
-                  value={category}
-                  onChangeText={(v) => {
-                    setCategory(v);
-                    if (categoryError) setCategoryError('');
-                  }}
-                  autoCapitalize="words"
-                />
-              </Input>
+              <CategorySelect
+                value={category}
+                onChange={(v) => {
+                  setCategory(v);
+                  if (categoryError) setCategoryError('');
+                }}
+                categories={categories}
+                placeholder="Selecione ou crie uma categoria"
+              />
               {categoryError ? (
                 <FormControlError>
                   <FormControlErrorText>{categoryError}</FormControlErrorText>

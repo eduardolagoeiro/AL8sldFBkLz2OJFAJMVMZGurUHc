@@ -9,11 +9,12 @@ import {
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect, useState } from 'react';
-import { useColorScheme } from '@/components/useColorScheme';
-import { Slot, usePathname } from 'expo-router';
+import { Slot } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { Fab, FabIcon } from '@/components/ui/fab';
-import { MoonIcon, SunIcon, SlashIcon } from '@/components/ui/icon';
+import {
+  ThemeProvider as AppThemeProvider,
+  useTheme,
+} from '@/lib/theme-context';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -52,27 +53,15 @@ export default function RootLayout() {
   }, [loaded, mswReady]);
 
   if (!mswReady) return null;
-  return <RootLayoutNav />;
+  return (
+    <AppThemeProvider>
+      <RootLayoutNav />
+    </AppThemeProvider>
+  );
 }
 
 function RootLayoutNav() {
-  const pathname = usePathname();
-  const systemColorScheme = useColorScheme();
-  const [mode, setMode] = useState<'system' | 'light' | 'dark'>('system');
-
-  // Determine effective color scheme
-  const effectiveColorScheme =
-    mode === 'system' ? (systemColorScheme ?? 'light') : mode;
-
-  const handleToggleTheme = () => {
-    if (mode === 'system') {
-      setMode('light');
-    } else if (mode === 'light') {
-      setMode('dark');
-    } else {
-      setMode('system');
-    }
-  };
+  const { mode, effectiveColorScheme } = useTheme();
 
   return (
     <GluestackUIProvider mode={mode}>
@@ -80,19 +69,6 @@ function RootLayoutNav() {
         value={effectiveColorScheme === 'dark' ? DarkTheme : DefaultTheme}
       >
         <Slot />
-        {pathname === '/' && (
-          <Fab onPress={handleToggleTheme} className="m-6" size="lg">
-            <FabIcon
-              as={
-                mode === 'system'
-                  ? SlashIcon
-                  : effectiveColorScheme === 'dark'
-                    ? MoonIcon
-                    : SunIcon
-              }
-            />
-          </Fab>
-        )}
       </ThemeProvider>
     </GluestackUIProvider>
   );

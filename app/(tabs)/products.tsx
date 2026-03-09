@@ -18,7 +18,26 @@ import {
   AlertDialogFooter,
   AlertDialogCloseButton,
 } from '@/components/ui/alert-dialog';
-import { AddIcon, EditIcon, SearchIcon, TrashIcon } from '@/components/ui/icon';
+import {
+  Select,
+  SelectTrigger,
+  SelectInput,
+  SelectIcon,
+  SelectPortal,
+  SelectBackdrop,
+  SelectContent,
+  SelectDragIndicatorWrapper,
+  SelectDragIndicator,
+  SelectItem,
+  SelectScrollView,
+} from '@/components/ui/select';
+import {
+  AddIcon,
+  EditIcon,
+  SearchIcon,
+  TrashIcon,
+  ChevronDownIcon,
+} from '@/components/ui/icon';
 import { Package } from 'lucide-react-native';
 import { Icon } from '@/components/ui/icon';
 import type { Product as ProductType } from '@/lib/types';
@@ -101,14 +120,25 @@ export default function ProductsScreen() {
   );
   const selectedStore = stores.find((s) => s.id === selectedStoreId);
 
+  const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
+
+  const categories = useMemo(
+    () => [...new Set(products.map((p) => p.category))].filter(Boolean).sort(),
+    [products]
+  );
+
   const filteredProducts = useMemo(() => {
+    let list = products;
+    if (categoryFilter) {
+      list = list.filter((p) => p.category === categoryFilter);
+    }
     const q = searchQuery.trim().toLowerCase();
-    if (!q) return products;
-    return products.filter(
+    if (!q) return list;
+    return list.filter(
       (p) =>
         p.name.toLowerCase().includes(q) || p.category.toLowerCase().includes(q)
     );
-  }, [products, searchQuery]);
+  }, [products, searchQuery, categoryFilter]);
 
   function handleEdit(product: ProductType) {
     setEditingProduct(product);
@@ -193,15 +223,45 @@ export default function ProductsScreen() {
             </HStack>
           </HStack>
 
-          <Box className="mb-4 md:mb-6">
-            <Input variant="outline" size="md" className="max-w-md">
-              <InputIcon as={SearchIcon} className="text-typography-500" />
-              <InputField
-                placeholder="Buscar por nome ou categoria..."
-                value={searchQuery}
-                onChangeText={setSearchQuery}
-              />
-            </Input>
+          <Box className="mb-4 md:mb-6 gap-4">
+            <HStack className="gap-4 flex-wrap">
+              <Input
+                variant="outline"
+                size="md"
+                className="flex-1 min-w-[200px]"
+              >
+                <InputIcon as={SearchIcon} className="text-typography-500" />
+                <InputField
+                  placeholder="Buscar por nome ou categoria..."
+                  value={searchQuery}
+                  onChangeText={setSearchQuery}
+                />
+              </Input>
+              <Select
+                selectedValue={categoryFilter ?? ''}
+                onValueChange={(v) => setCategoryFilter(v || null)}
+                className="w-[200px]"
+              >
+                <SelectTrigger>
+                  <SelectInput placeholder="Filtrar por categoria" />
+                  <SelectIcon as={ChevronDownIcon} className="mr-3" />
+                </SelectTrigger>
+                <SelectPortal>
+                  <SelectBackdrop />
+                  <SelectContent className="max-h-48">
+                    <SelectDragIndicatorWrapper>
+                      <SelectDragIndicator />
+                    </SelectDragIndicatorWrapper>
+                    <SelectScrollView>
+                      <SelectItem label="Todas" value="" />
+                      {categories.map((cat) => (
+                        <SelectItem key={cat} label={cat} value={cat} />
+                      ))}
+                    </SelectScrollView>
+                  </SelectContent>
+                </SelectPortal>
+              </Select>
+            </HStack>
           </Box>
 
           {error ? (
@@ -221,7 +281,9 @@ export default function ProductsScreen() {
               <Text className="text-typography-500 text-center">
                 {searchQuery.trim()
                   ? 'Nenhum produto encontrado.'
-                  : 'Nenhum produto cadastrado.'}
+                  : categoryFilter
+                    ? 'Nenhum produto nesta categoria.'
+                    : 'Nenhum produto cadastrado.'}
               </Text>
             </Box>
           ) : (
@@ -250,6 +312,7 @@ export default function ProductsScreen() {
         onSubmit={handleFormSubmit}
         product={editingProduct}
         storeId={selectedStoreId ?? editingProduct?.storeId ?? ''}
+        categories={categories}
       />
 
       <AlertDialog

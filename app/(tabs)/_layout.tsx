@@ -2,6 +2,7 @@ import React from 'react';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Tabs } from 'expo-router';
 import { useClientOnlyValue } from '@/components/useClientOnlyValue';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 function TabBarIcon(props: {
   name: React.ComponentProps<typeof FontAwesome>['name'];
@@ -16,6 +17,7 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         headerShown,
+        headerRight: () => <ThemeToggle />,
       }}
     >
       <Tabs.Screen
