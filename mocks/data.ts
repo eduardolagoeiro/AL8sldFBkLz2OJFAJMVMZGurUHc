@@ -1,6 +1,6 @@
 import type { Store, Product } from '@/lib/types';
 
-const stores: Store[] = [
+const initialStores: Store[] = [
   {
     id: '550e8400-e29b-41d4-a716-446655440001',
     name: 'Loja Central',
@@ -13,7 +13,7 @@ const stores: Store[] = [
   },
 ];
 
-const products: Product[] = [
+const initialProducts: Product[] = [
   {
     id: '660e8400-e29b-41d4-a716-446655440001',
     storeId: '550e8400-e29b-41d4-a716-446655440001',
@@ -38,6 +38,13 @@ const products: Product[] = [
 ];
 
 export const db = {
-  stores,
-  products,
+  stores: [...initialStores],
+  products: [...initialProducts],
 };
+
+export function resetDb() {
+  db.stores.length = 0;
+  db.stores.push(...initialStores);
+  db.products.length = 0;
+  db.products.push(...initialProducts);
+}
