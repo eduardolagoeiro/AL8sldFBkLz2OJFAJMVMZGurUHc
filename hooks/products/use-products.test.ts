@@ -1,6 +1,6 @@
 import { act, renderHook, waitFor } from '@testing-library/react-native';
-import { useAppStore } from './store';
-import type { Product } from './types';
+import { useAppStore } from '@/lib/store';
+import type { Product } from '@/lib/products';
 
 const mockFetchProducts = jest.fn();
 const mockFetchAllProducts = jest.fn();
@@ -8,7 +8,8 @@ const mockCreateProductApi = jest.fn();
 const mockUpdateProductApi = jest.fn();
 const mockDeleteProductApi = jest.fn();
 
-jest.mock('./products-api', () => ({
+jest.mock('@/lib/products', () => ({
+  ...jest.requireActual('@/lib/products'),
   fetchProducts: (...args: unknown[]) => mockFetchProducts(...args),
   fetchAllProducts: (...args: unknown[]) => mockFetchAllProducts(...args),
   createProduct: (...args: unknown[]) => mockCreateProductApi(...args),

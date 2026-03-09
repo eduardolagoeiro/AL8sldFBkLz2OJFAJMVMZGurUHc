@@ -5,11 +5,15 @@ import {
   createProduct as createProductApi,
   updateProduct as updateProductApi,
   deleteProduct as deleteProductApi,
-} from './products-api';
-import { useAppStore } from './store';
-import type { CreateProductInput, Product, UpdateProductInput } from './types';
-import { createProductSchema, updateProductSchema } from './types';
-import { formatZodMessage } from './format-zod-message';
+} from '@/lib/products';
+import { useAppStore } from '@/lib/store';
+import type {
+  CreateProductInput,
+  Product,
+  UpdateProductInput,
+} from '@/lib/products';
+import { createProductSchema, updateProductSchema } from '@/lib/products';
+import { formatZodMessage } from '@/lib/utils/format-zod-message';
 
 const EMPTY_PRODUCTS: Product[] = [];
 

@@ -1,8 +1,8 @@
 import { useState, useMemo } from 'react';
-import { useStores } from './use-stores';
-import { useProducts } from './use-products';
-import { useAppStore } from './store';
-import type { Product } from './types';
+import { useAppStore } from '@/lib/store';
+import type { Product } from '@/lib/products';
+import { useStores } from '@/hooks/stores/use-stores';
+import { useProducts } from '@/hooks/products/use-products';
 
 export function useProductsScreen() {
   const { stores } = useStores();

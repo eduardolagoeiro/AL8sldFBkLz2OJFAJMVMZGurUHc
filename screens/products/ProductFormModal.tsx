@@ -19,7 +19,7 @@ import {
 } from '@/components/ui/form-control';
 import { Box } from '@/components/ui/box';
 import { Text } from '@/components/ui/text';
-import { CategorySelect } from '@/components/CategorySelect';
+import { CategorySelect } from './CategorySelect';
 import type { Product, CreateProductInput } from '@/lib/types';
 
 interface ProductFormModalProps {

@@ -1,4 +1,4 @@
-import { apiUrl } from './api';
+import { apiUrl } from '@/lib/api';
 import type { Store, CreateStoreInput, UpdateStoreInput } from './types';
 
 export async function fetchStores(): Promise<Store[]> {

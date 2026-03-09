@@ -1,5 +1,37 @@
 # Starter Kit Expo
 
+## Estrutura do projeto
+
+```
+├── app/                    # Expo Router (rotas e layouts)
+│   ├── (tabs)/             # Tabs: products, stores
+│   ├── _layout.tsx
+│   └── index.tsx
+├── assets/
+├── components/             # Componentes reutilizáveis
+│   ├── ui/                 # Gluestack UI primitives
+│   ├── ThemeToggle.tsx
+│   ├── ErrorBanner.tsx
+│   └── ...
+├── constants/
+├── hooks/
+│   ├── products/           # Hooks de produtos
+│   ├── stores/             # Hooks de lojas
+│   └── ui/                 # useColorScheme, useClientOnlyValue
+├── lib/                    # API, store, tipos, utils
+│   ├── api/
+│   ├── products/           # products API + types
+│   ├── stores/             # stores API + types
+│   ├── store/              # Zustand store
+│   └── utils/
+├── mocks/                  # MSW handlers e data
+├── providers/              # Context providers (theme)
+├── screens/                 # Telas por domínio
+│   ├── products/
+│   └── stores/
+└── test-utils.tsx
+```
+
 ## Tecnologias e versões
 
 | Tecnologia            | Versão           |

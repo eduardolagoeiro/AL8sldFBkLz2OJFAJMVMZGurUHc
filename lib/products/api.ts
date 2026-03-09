@@ -1,4 +1,4 @@
-import { apiUrl } from './api';
+import { apiUrl } from '@/lib/api';
 import type { Product, CreateProductInput, UpdateProductInput } from './types';
 
 export async function fetchProducts(storeId: string): Promise<Product[]> {

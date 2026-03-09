@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useCallback } from 'react';
-import { useColorScheme } from '@/components/useColorScheme';
+import { useColorScheme } from '@/hooks';
 
 export type ThemeMode = 'system' | 'light' | 'dark';
 

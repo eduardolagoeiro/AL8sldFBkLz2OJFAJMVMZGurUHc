@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import type { Store, Product } from './types';
+import type { Store } from '@/lib/stores';
+import type { Product } from '@/lib/products';
 
 interface AppState {
   stores: Store[];

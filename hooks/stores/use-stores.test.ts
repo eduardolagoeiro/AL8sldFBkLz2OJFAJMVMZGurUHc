@@ -1,5 +1,5 @@
 import { act, renderHook, waitFor } from '@testing-library/react-native';
-import type { Store } from './types';
+import type { Store } from '@/lib/stores';
 
 const mockStores: Store[] = [
   {
@@ -14,7 +14,8 @@ const mockCreateStoreApi = jest.fn();
 const mockUpdateStoreApi = jest.fn();
 const mockDeleteStoreApi = jest.fn();
 
-jest.mock('./stores-api', () => ({
+jest.mock('@/lib/stores', () => ({
+  ...jest.requireActual('@/lib/stores'),
   fetchStores: (...args: unknown[]) => mockFetchStores(...args),
   createStore: (...args: unknown[]) => mockCreateStoreApi(...args),
   updateStore: (...args: unknown[]) => mockUpdateStoreApi(...args),

@@ -4,11 +4,11 @@ import {
   createStore as createStoreApi,
   updateStore as updateStoreApi,
   deleteStore as deleteStoreApi,
-} from './stores-api';
-import { useAppStore } from './store';
-import type { CreateStoreInput, Store, UpdateStoreInput } from './types';
-import { createStoreSchema, updateStoreSchema } from './types';
-import { formatZodMessage } from './format-zod-message';
+} from '@/lib/stores';
+import { useAppStore } from '@/lib/store';
+import type { CreateStoreInput, Store, UpdateStoreInput } from '@/lib/stores';
+import { createStoreSchema, updateStoreSchema } from '@/lib/stores';
+import { formatZodMessage } from '@/lib/utils/format-zod-message';
 
 const EMPTY_STORES: Store[] = [];
 

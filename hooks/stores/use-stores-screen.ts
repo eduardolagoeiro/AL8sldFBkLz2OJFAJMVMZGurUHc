@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useStores } from './use-stores';
-import type { Store } from './types';
+import type { Store } from '@/lib/stores';
 
 export function useStoresScreen() {
   const { stores, loading, error, createStore, updateStore, deleteStore } =
