@@ -48,9 +48,8 @@ function RootLayoutNav() {
   const [mode, setMode] = useState<'system' | 'light' | 'dark'>('system');
 
   // Determine effective color scheme
-  const effectiveColorScheme = mode === 'system'
-    ? (systemColorScheme ?? 'light')
-    : mode;
+  const effectiveColorScheme =
+    mode === 'system' ? (systemColorScheme ?? 'light') : mode;
 
   const handleToggleTheme = () => {
     if (mode === 'system') {
@@ -64,15 +63,21 @@ function RootLayoutNav() {
 
   return (
     <GluestackUIProvider mode={mode}>
-      <ThemeProvider value={effectiveColorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+      <ThemeProvider
+        value={effectiveColorScheme === 'dark' ? DarkTheme : DefaultTheme}
+      >
         <Slot />
         {pathname === '/' && (
-          <Fab
-            onPress={handleToggleTheme}
-            className="m-6"
-            size="lg"
-          >
-            <FabIcon as={mode === 'system' ? SlashIcon : (effectiveColorScheme === 'dark' ? MoonIcon : SunIcon)} />
+          <Fab onPress={handleToggleTheme} className="m-6" size="lg">
+            <FabIcon
+              as={
+                mode === 'system'
+                  ? SlashIcon
+                  : effectiveColorScheme === 'dark'
+                    ? MoonIcon
+                    : SunIcon
+              }
+            />
           </Fab>
         )}
       </ThemeProvider>
