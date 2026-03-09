@@ -22,23 +22,36 @@ export {
 
 SplashScreen.preventAutoHideAsync();
 
+async function enableMocking() {
+  if (!__DEV__) return;
+  await import('../msw.polyfills');
+  const { server } = await import('../mocks/server');
+  if (server?.listen) server.listen();
+}
+
 export default function RootLayout() {
   const [loaded, error] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
     ...FontAwesome.font,
   });
 
-  const [styleLoaded, setStyleLoaded] = useState(false);
-  // Expo Router uses Error Boundaries to catch errors in the navigation tree.
+  const [mswReady, setMswReady] = useState(!__DEV__);
+
   useEffect(() => {
     if (error) throw error;
   }, [error]);
 
   useEffect(() => {
-    if (loaded) {
+    enableMocking().then(() => setMswReady(true));
+  }, []);
+
+  useEffect(() => {
+    if (loaded && mswReady) {
       SplashScreen.hideAsync();
     }
-  }, [loaded]);
+  }, [loaded, mswReady]);
+
+  if (!mswReady) return null;
   return <RootLayoutNav />;
 }
 
