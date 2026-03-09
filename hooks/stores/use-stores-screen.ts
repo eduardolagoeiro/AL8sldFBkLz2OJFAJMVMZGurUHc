@@ -1,23 +1,29 @@
 import { useState, useMemo } from 'react';
 import { useStores } from './use-stores';
+import { useAppStore } from '@/lib/store';
 import type { Store } from '@/lib/stores';
 
 export function useStoresScreen() {
   const { stores, loading, error, createStore, updateStore, deleteStore } =
     useStores();
+  const productsByStore = useAppStore((s) => s.productsByStore);
   const [searchQuery, setSearchQuery] = useState('');
   const [formOpen, setFormOpen] = useState(false);
   const [editingStore, setEditingStore] = useState<Store | null>(null);
   const [deleteStoreId, setDeleteStoreId] = useState<string | null>(null);
 
   const filteredStores = useMemo(() => {
+    const withLiveCount = stores.map((s) => ({
+      ...s,
+      productCount: productsByStore[s.id]?.length ?? s.productCount ?? 0,
+    }));
     const q = searchQuery.trim().toLowerCase();
-    if (!q) return stores;
-    return stores.filter(
+    if (!q) return withLiveCount;
+    return withLiveCount.filter(
       (s) =>
         s.name.toLowerCase().includes(q) || s.address.toLowerCase().includes(q)
     );
-  }, [stores, searchQuery]);
+  }, [stores, productsByStore, searchQuery]);
 
   function handleEdit(store: Store) {
     setEditingStore(store);
